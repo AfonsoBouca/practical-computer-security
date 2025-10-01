@@ -7,22 +7,23 @@
 
 ## Catalogação
 - Publicação: 2019-12-30.
-- Está catalogada com um grau de gravidade alto: CVSS Base Score: 7.5 (v3.1) 
+- Está catalogada com um grau de gravidade alto: CVSS Base Score: 7.5 (v3.1).
 - Tem uma probabilidade elevada de ser explorada: EPSS Score: 94.47%.
 
 ## Exploit
-- Existem PoC e scripts públicos no Exploit-DB que demonstram a exploração. 
+- Existe PoC público no Exploit-DB e um módulo Metasplot que automatiza o exploit.
 - O módulo Metasploit explora o Solr (versão abaixo da 8.3.0) que, através de um HTTP POST request para a Config API, há a ativação do parâmetro _params.resource.loader_.
 - O atacante identifica primeiro os nomes dos cores Solr disponíveis no alvo.
 - É enviado um POST especialmente criado à Config API para ativar params.resource.loader=true no solrconfig.xml, permitindo o uso do parâmetro velocity em pedidos posteriores, o que pode conduzir a RCE.
 
 ## Ataques
-- Um ataque apartir desta vulnerabilidade 
+- Pela pesquisa realizada, não foi encontrada nenhum relato pũblico de um ataque bem sucedido.
+- Um potencial ataque permitiria um utilizador remoto executar código no servidor Solr e instalar backdoors e também permitiria roubar dados/documentos indexados pelo Solr.
 
 ## Correção/Contramedidas
 - Atualizar para a patch oficial Apache Solr ou para versões ≥ 8.4, de forma a corrigir a vulnerabilidade.
 - Desactivar ou restringir o acesso à Config API.
-- Desativar VelocityResponseWriter ou restringir templates, garantir que _params.resource.loader.enabled _não está activo
+- Desativar VelocityResponseWriter ou restringir templates, garantir que _params.resource.loader.enabled _não está activo.
 - A renderização de templates fornecidos por configset so é permitida se o configset for considerado _trusted_.
 
 ## Referẽncias
