@@ -41,5 +41,30 @@ Agora apenas é necessário correr o programa com a vulnerabilidade (linha 3 da 
 ![image](task6_attack.png)
 
 ## Questão 2
+### Task 8 
+Nesta tarefa analisámos a segurança de um programa, catall.c, que foi concebido para ser utilizado como **set‑UID**. Este programa permite a leitura de ficheiros do sistema aos quais certos utilizadores normalmente nao tem accesso (Bob). No entanto, o programa faz uso de system() que invoca o shell do sistema onde é passada uma string, que é interpretada. O shell interpreta não só a string mas também metacaracteres, onde a partir dai, é possivel realizar um command injection.
+Como mostrado na Imagem 1, criámos um ficheiro de teste task8.txt com texto simples.
+
+**Imagem 1:** Criação do ficheiro task8.txt
+![image](task8_txt.png)
+
+Como primeiro passo, utilizamos o programa com uma versão vulnerável, com recurso ao uso de system() em vez de execve().
+No entanto, como o programa tem permissões root é possivel alterar/remover ficheiros.
+
+**Imagem 2:** Remoção do ficheiro task8.txt através de command injection - uso de system()
+![image](task8_system.png)
+
+Nesta imagem podemos verificar que ao correr ./catall task8.txt ou ./catall "task8.txt" é possivel ler o conteudo do ficheiro.
+No entanto ao usar "task8.txt;rm task8.txt" como argumento, o shell executa o comando rm e conseguimos eliminar o ficheiro. É possivel confirmar isso ao tentar correr novamente o programa com o task8.txt como argumento.
+Concluimso que esta versão com recurso ao uso de system(), que permite a execução de comandos arbitrários pelo utilizador, compromete a integridade do sistema.
+
+Como segundo passo, desta vez comentamos o system() e utilizamos execve(). Após compilar e definir novamente como set-UID, corremos o programa com o ficheiro task8.txt com o mesmo conteúdo.
+O ficheiro também foi lido como esperado mas desta vez, ao tentar realizar novamente o ataque com "task8.txt;rm task8.txt", retornou um erro de que o ficheiro não existia, como mostrado na imagem 3.
+
+**Imagem 3:** Tentativa de remoção do ficheiro task8.txt através de command injection - uso de execve()
+![image](task8_execve.png)
+
+Devido ao uso de execve(), o binaŕio é executado diretamente sem invocar shell, onde o programa cat tenta abrir um ficheiro com o exato nome "task8.txt;rm task8.txt", não executanto o comando rm e mantendo a integridade do ficheiro.
+
 
 ## Questão 3
