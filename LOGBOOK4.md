@@ -42,7 +42,7 @@ Agora apenas é necessário correr o programa com a vulnerabilidade (linha 3 da 
 
 ## Questão 2
 ### Task 8 
-Nesta tarefa analisámos a segurança de um programa, catall.c, que foi concebido para ser utilizado como **set‑UID**. Este programa permite a leitura de ficheiros do sistema aos quais certos utilizadores normalmente nao tem accesso (Bob). No entanto, o programa faz uso de system() que invoca o shell do sistema onde é passada uma string, que é interpretada. O shell interpreta não só a string mas também metacaracteres, onde a partir dai, é possivel realizar um command injection.
+Nesta tarefa analisámos a segurança de um programa, catall.c, que foi concebido para ser utilizado como **set‑UID**. Este programa permite a leitura de ficheiros do sistema aos quais certos utilizadores normalmente não tem accesso (Bob). No entanto, o programa faz uso de system() que invoca o shell do sistema onde é passada uma string, que é interpretada. O shell interpreta não só a string mas também metacaracteres, onde a partir dai, é possivel realizar um command injection.
 Como mostrado na Imagem 3, criámos um ficheiro de teste task8.txt com texto simples.
 
 **Imagem 3:** Criação do ficheiro task8.txt
@@ -68,3 +68,58 @@ Devido ao uso de execve(), o binaŕio é executado diretamente sem invocar shell
 
 
 ## Questão 3
+### Preparação
+Numa vulnerabilidade de partilha de capabilities, existe um ficheiro cujo único editor é o root e um programa Set-UID que mantém esse ficheiro aberto e nos fornece uma linha de comandos (shell) com os privilégios do utilizador normal. Para demonstrar a vulnerabilidade é utilizado o programa cap_leak.c com o seguinte código fonte:
+
+```c
+void main() {
+    int fd;
+    char *v[2];
+
+    /* Assume that /etc/zzz is an important system file,
+    * and it is owned by root with permission 0644.
+    * Before running this program, you should create
+    * the file /etc/zzz first. */
+    fd = open("/etc/zzz", O_RDWR | O_APPEND);
+    if (fd == -1) {
+        printf("Cannot open /etc/zzz\n");
+        exit(0);
+    }
+
+    // Print out the file descriptor value
+    printf("fd is %d\n", fd);
+    // Permanently disable the privilege by making the
+    // effective uid the same as the real uid
+    setuid(getuid());
+    // Execute /bin/sh
+    v[0] = "/bin/sh"; v[1] = 0;
+    execve(v[0], v, 0);
+}
+```
+
+**Imagem 6:** Preparação do ambiente e criação dos ficheiros priviligiados 
+![image](task9_setup.png)
+### Execução
+Para executar o ataque descobrimos o **fd** com o acesso previligiado do ficheiro onde queremos escrever e executamos o seguinte código:
+
+```bash
+# escreve através do fd 3 (o ficheiro do exemplo da imagem 7)
+echo "Malware" >&3
+```
+Como podemos ver na imagem 7 o ataque está completo e conseguimos modificar um ficheiro que necessita de permissões **root** com um perfil de utilizador.
+  
+**Imagem 7:** Execução do ataque
+![image](task9_attack.png)
+
+### Explicação técnica
+Esta vulnerabilidade ocorre porque **setuid(getuid())** não altera as permissões obtidas anteriormente, apenas modifica as capacidades que o programa tem a partir desse ponto.  
+Neste caso é aberto um ficheiro em modo escrita que um utilizador comum não pode modificar.  
+Como as permissões de acesso a um ficheiro são apenas verificadas em **open()**, por razões de eficiência, escritas consequentes não são verificadas, sendo possível utilizar o descritor aberto priviligiado para fazer modificações não autorizadas.
+
+### Medidas de mitigação
+De modo a prevenir este tipo de ataques no futuro deve-se evitar o uso de **Set-UID** ou abrir os ficheiros apenas após a chamada a **setuid(getuid())**.  
+
+Se forem necessárias as permissões, dado que não é suposto o utilizador modificar o ficheiro, este deve ser fechado ou as permissões às quais não é suposto ter acesso devem ser removidas manualmente. Assim, mesmo que se tente o mesmo ataque, não é possível modificar o ficheiro pois as permissões especiais dessa abertura foram revocadas.
+
+### Conclusões
+Devido à natureza destes programas e ao perigos associados, **Set-UID** deve ser apenas utilizado quando estritamente necessário e deve-se seguir modelos de privilégios mínimos e reduzindo desta forma os perigos associados à escalada de privilégios e ao comprometimento do sistema.
