@@ -1,3 +1,23 @@
 # Buffer-Overflow Attack Lab - Set-UID Version
 ## Questão 1
+Na primeira parte do guião, desativamos o Address Space Randomization (de forma a conseguirmos 'adivinhar' os registros mais facilmente) e configuramos /bin/sh para zsh para facilitar permitir a execução da shell por processos com Set-UID.
+
+Comandos usados:
+>```bash
+> $ sudo sysctl -w kernel.randomize_va_space=0
+> $ sudo ln -sf /bin/zsh /bin/sh
+>```
+
+### Task 1
+
+Na tarefa 1, fomos familiarizados com o shellcode.
+Primeiramente executámos um programa que abre uma shell, devido ao uso do comando *execve()*.
+
+Posteriormente, compilámos o programa call_shellcode.c e executámos os binaŕios a32.out e a64.out onde cada um deles abre uma shell.
+Neste caso invocámos o shellcode a partir da stack.
+![image](docs/logbook5/task1.png)
+
+### Task 2
+
+
 ## Questão 2
