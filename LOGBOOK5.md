@@ -19,5 +19,12 @@ Neste caso invocámos o shellcode a partir da stack.
 
 ### Task 2
 
+Nesta tarefa, analisámos o comportamento de um programa vulnerável, stack.c, onde verificámos que ele tenta copiar um array com um máximo de 517 bytes, para um buffer com um tamanho máximo de 100 bytes. 
+O *strcpy(buffer, str)* causa um buffer overflow, porque a função *strcpy()* apenas faz uma substituição do conteúdo no destino e não realiza nenhum tipo de verificação do tamanho do array, pelo que neste caso str > buffer.
+
+Para compilar este programa vulnerável, desativamos o StackGuard e as proteções contra a execução de código por parte da stack. Também definimos como Set-UID.
+
+### Task 3
+
 
 ## Questão 2
