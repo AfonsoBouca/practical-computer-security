@@ -106,6 +106,39 @@ void dummy_function(char *str)
     myprintf(str);
 }
 ```
+
 __Task 2:__  
+Esta task consiste em obter o número de "%x" necessários para conseguir ler novamente os primeiros 2 bytes do input.
+
+Para isso utilizamos o mesmo setup da task 1 e corremos o comando *docker-compose up*. Com o servidor pronto preparamos um ficheiro file.txt com o código mystr.py para o ataque.
+
+__mystr.py:__ 
+```python
+N = 1500
+content = bytearray(0x0 for i in range(N))
+
+content[0:4]  =  ("aaaa").encode('latin-1')
+
+s = "%x\n"*100
+fmt  = (s).encode('latin-1')
+content[4:4+len(fmt)] = fmt
+
+with open('file.txt', 'wb') as f:
+    f.write(content)
+```
+
+Como não é possível saber onde se encontrará a string original é usada a string "aaaa" para melhor identificação do inicio do input seguida de um valor grande de "%x\n" para ser possível examinar a pilha inteira sem problemas.
+
+Após executar o código do terminal da direita na imagem 3, para determinar quantos "%x" são necessários basta contar no log do servidor quantas linhas são apresentadas até aparecer a palavra 61616161 (hex de "aaaa" destacado na imagem 3) na saída.
+
+__Imagem 3:__ execução do ataque.
+![imagem](docs/logbook6/task2A.png)
+
+Assim calculamos que são necessários 64 "\x" para imprimir até os primeiros 4 bytes do input.
+Para demonstar o resultado obtido foi refeito o ataque com um input novo que contém 64 "%x" na imagem 4.
+
+__Imagem 4:__ Testagem do valor obtido
+![imagem4](docs/logbook6/task2A_proof.png)
+
 __Task 3:__
 ## Questão 2
