@@ -66,9 +66,10 @@ __Task 3:__
 **Resultado:**
 O servidor netcat recebe um pedido HTTP GET contendo os cookies de boby:
 
+
 ![image](docs/logbook7/LOGBOOK7(3).png)
 
-O código JavaScript injeta dinamicamente uma tag <img> no HTML da página. Quando essa tag é criada, o navegador tenta carregar a “imagem”, fazendo um pedido HTTP GET para o servidor do atacante (10.9.0.1:5555), incluindo os cookies da vítima como parte da URL.
+O código JavaScript injeta dinamicamente uma tag `<img>` no HTML da página. Quando essa tag é criada, o navegador tenta carregar a “imagem”, fazendo um pedido HTTP GET para o servidor do atacante (10.9.0.1:5555), incluindo os cookies da vítima como parte da URL.
 Como o browser envia automaticamente este pedido, os cookies são transmitidos para o atacante, que os pode usar para personificar a vítima.
 
 __Task 4:__
