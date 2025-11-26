@@ -207,7 +207,7 @@ EARNING BEST DIRECTOR NOMINATIONS ARE FEW AND FAR BETWEEN
 ```
 
 ## Tarefa 2
-Nesta tarefa iremos estudar alguns algoritmos de cifração, e como são utilizados para cifrar texto.
+Nesta tarefa estudámos o funcionamento de diferentes modos de cifração do algoritmo AES-128, observando como cada um processa e transforma texto claro durante a cifragem e decifragem.
 
 Para isso foi criado o ficheiro __plaintext.txt__ com o seguinte texto e 1041 bytes de tamanho:
 ```
@@ -224,11 +224,70 @@ The European languages are members of the same family. Their separate existence 
 For science, music, sport, etc, Europe uses the same vocabulary.
 ```
 
-### aes-128-ecb
+### AES-128-ecb
 
 Para encriptar e desencriptar o ficheiro foram executados os comandos da figura 1:
 
 __Figura 1:__ encriptação utilizando a cifra aes-128-ecb.
 ![aes-128-ecb](/docs/logbook9/task2_ecb.png)
 
+Flags especificadas:
+- **`aes-128-ecb`** - especifica o modo ECB.
+- **`e`**/**`d`** - encriptar/desencriptar
+- **`in`** - ficheiro original.
+- **`out`** - ficheiro cifrado.
+- **`K`** - chave em hexadecimal.
 
+Descrição do modo:
+
+O modo ECB (Electronic Codebook) divide o texto em blocos de 16 bytes e cifra cada bloco independentemente dos restantes.
+
+A principal vantagem deste modo é a paralelização total (cada bloco é processado isoladamente).
+
+Infelizmente é inseguro e não pode ser utilizado em aplicações reais: blocos iguais de plaintext produzem blocos iguais de ciphertext pelo que padrões no texto original tornam-se facilmente visíveis no texto cifrado.
+
+Este comportamento é particularmente evidente em ficheiros com repetições ou imagens.
+
+### AES-128-cbc
+__Figura 2:__ encriptação utilizando a cifra aes-128-cbc.
+![aes-128-cbc](/docs/logbook9/task2_cbc.png)
+
+Flags especificadas:
+- **`aes-128-ecb`** - especifica o modo ECB.
+- **`e`**/**`d`** - encriptar/desencriptar
+- **`in`** - ficheiro original.
+- **`out`** - ficheiro cifrado.
+- **`K`** - chave em hexadecimal.
+- **`iv`** - vetor de inicialização.
+
+Descrição do modo:
+
+O modo CBC (Cipher Block Chaining) introduz dependência entre blocos.
+
+Cada bloco de texto é combinado com o bloco anterior cifrado através de XOR sendo para o primeiro bloco utilizado um vetor de inicialização aleatório, pois não existe bloco anterior. Após isso, o resultado do XOR é cifrado com AES.
+
+Esta metodologia elimina padrões do ECB pois dois blocos iguais resultam em blocos cifrados diferentes mas torna o processo não paralelizável na cifragem.
+
+### AES-128-ctr
+__Figura 3:__ encriptação utilizando a cifra aes-128-ctr.
+![aes-128-ctr](/docs/logbook9/task2_ctr.png)
+
+Flags especificadas:
+- **`aes-128-ecb`** - especifica o modo ECB.
+- **`e`**/**`d`** - encriptar/desencriptar
+- **`in`** - ficheiro original.
+- **`out`** - ficheiro cifrado.
+- **`K`** - chave em hexadecimal.
+- **`iv`** - vetor de inicialização.
+
+Descrição do modo:
+
+O modo CTR (Counter) transforma o AES numa cifra de fluxo.
+
+AES cifra um valor composto pelo vetor de inicialização e um contador cujo resultado funciona como keystream.
+
+O texto é combinado com a keystream através de XOR e os blocos são completamente independentes entre si pelo que é totalmente paralelizável.
+
+A segurança depende crucialmente de nunca reutilizar o mesmo IV com a mesma chave.
+
+A principal diferença deste modo para os restantes é a utilização do mesmo algoritmo para a cifração e decifração como verificamos na figura 3: Obtemos o texto original cifrando ou decifrando o texto cifrado.
