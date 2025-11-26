@@ -291,3 +291,6 @@ O texto é combinado com a keystream através de XOR e os blocos são completame
 A segurança depende crucialmente de nunca reutilizar o mesmo IV com a mesma chave.
 
 A principal diferença deste modo para os restantes é a utilização do mesmo algoritmo para a cifração e decifração como verificamos na figura 3: Obtemos o texto original cifrando ou decifrando o texto cifrado.
+
+## Tarefa 5
+Para esta tarefa executamos os mesmos passos da tarefa 2 mas antes da decifragem modificamos o byte 250 para AA.
