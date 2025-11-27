@@ -293,4 +293,26 @@ A segurança depende crucialmente de nunca reutilizar o mesmo IV com a mesma cha
 A principal diferença deste modo para os restantes é a utilização do mesmo algoritmo para a cifração e decifração como verificamos na figura 3: Obtemos o texto original cifrando ou decifrando o texto cifrado.
 
 ## Tarefa 5
-Para esta tarefa executamos os mesmos passos da tarefa 2 mas antes da decifragem modificamos o byte 250 para AA.
+O objetivo desta tarefa é entender como a corrupção de um byte no texto cifrado afeta o resultado da cifra.
+Com isso em mente executamos os mesmos passos da tarefa 2 para cada modo de cifra mas antes da decifragem modificamos o byte 250 do texto cifrado para AA.
+
+### AES-128-ecb
+
+No modo ECB, cada bloco de 16 bytes do texto é cifrado de forma independente. Por isso, a corrupção de um único byte no texto cifrado afeta todo o bloco correspondente no texto decifrado. Ou seja, um byte corrompido no criptograma resulta na perda de 16 bytes de informação no texto final.
+
+__Figura 4:__ Resultado da corrupção de um byte na cifra ecb.
+![aes-128-ecb](/docs/logbook9/task5_ecb.png)
+
+### AES-128-cbc
+
+No modo CBC, cada bloco de texto é cifrado utilizando o bloco anterior cifrado e a chave AES. Como consequência, a corrupção de um único byte no texto cifrado afeta todo o bloco correspondente no texto decifrado, e ainda um byte na mesma posição do bloco seguinte devido ao xor que é feito do texto original com o texto cifrado anterior. Ou seja, a alteração propaga-se parcialmente: 16 bytes do bloco corrompido mais 1 byte no bloco seguinte são afetados.
+
+__Figura 5:__ Resultado da corrupção de um byte na cifra cbc.
+![aes-128-cbc](/docs/logbook9/task5_cbc.png)
+
+### AES-128-ctr
+
+No modo CTR cada byte do plaintext é combinado com um byte de keystream gerado a partir do contador e da chave AES através de XOR. Por essa razão a corrupção de um único byte no texto cifrado afeta apenas o byte correspondente no texto decifrado, sem propagar o erro para os restantes bytes.
+
+__Figura 6:__ Resultado da corrupção de um byte na cifra ctr.
+![aes-128-](/docs/logbook9/task5_ctr.png)
