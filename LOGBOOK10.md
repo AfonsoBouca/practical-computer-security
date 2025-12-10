@@ -30,5 +30,27 @@ http://www.seedlab-hashlen.com/?myname=DanielPinto&uid=1001&lstcmd=1&download=se
 ![Download bem sucedido](/docs/logbook10/task1_sucess.png)
 
 ## Task 2
+123456:myname=DanielPinto&uid=1001&lstcmd=1
+Comprimento: 43 bytes
+
+padding binário é:
+\x80
+\x00 x12
+\x00\x00\x00\x00\x00\x00\x01\x58
+
+
+calculo do mac :
+```
+echo -n "123456:myname=DanielPinto&uid=1001&lstcmd=1&download=secret.txt\x80\x00x12\x00\x00\x00\x00\x00\x00\x01\x58" | sha256sum
+```
+
+![alt text](/docs/logbook10/image.png)
+
 
 ## Task 3
+
+![alt text](/docs/logbook10/image-1.png)
+
+```
+http://www.seedlab-hashlen.com/?myname=DanielPinto&uid=1001&lstcmd=1&download=secret.txt&mac=612ca45834715ab11b04d2ef20dfc0fad969432b8e8b2ace4c9176d7d217059d
+```
