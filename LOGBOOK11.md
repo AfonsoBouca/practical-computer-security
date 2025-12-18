@@ -307,12 +307,12 @@ A partir deste output identificam-se os seguintes valores:
 
 - Modulus (n): igual ao presente no certificado;
 - Public Exponent (e): também disponível no certificado;
-- Private Exponent (d): Exponente privado;
-- Prime1 (p): Primo 1 utilizado para gerar o modulos;
-- Prime2 (q): Primo 2 utilizado para gerar o modulos.
+- Private Exponent (d): exponente privado;
+- Prime1 (p): primo 1 utilizado para gerar o módulo;
+- Prime2 (q): primo 2 utilizado para gerar o módulo.
 
 ## Tarefa 2
-Nesta tarefa vamos obter um certificado público assinado pela nossa Certificate Authority (CA) para o website **www.bank32.com** que tem nomes alternativos. Para tal, é necessário gerar um Certificate Signing Request (CSR), que contém a chave pública do servidor e a informação de identidade da entidade requerente gerado atravez do seguinte comando:
+Nesta tarefa vamos obter um certificado público assinado pela nossa Certificate Authority (CA) para o website **www.bank32.com**, que tem nomes alternativos. Para tal, é necessário gerar um Certificate Signing Request (CSR), que contém a chave pública do servidor e a informação de identidade da entidade requerente, gerado através do seguinte comando:
 
 ```bash
 openssl req -newkey rsa:2048 -sha256 \
@@ -323,3 +323,56 @@ openssl req -newkey rsa:2048 -sha256 \
 ```
 
 ## Tarefa 3
+O objetivo desta tarefa é assinar o CSR gerado na tarefa 2.
+
+Como o certificado contém uma extensão, é necessário adicionar ao ficheiro de configuração myCA_openssl.cnf a linha "copy_extensions = copy" para permitir que a extensão apareça no certificado final.
+
+Com o ambiente preparado e as configurações corretas, executámos o seguinte comando para assinar o certificado:
+
+```bash
+openssl ca -config myCA_openssl.cnf -policy policy_anything \
+-md sha256 -days 3650 \
+-in server.csr -out server.crt -batch \
+-cert ca.crt -keyfile ca.key
+```
+
+Após gerar o certificado, verificámos o seu conteúdo com o comando:
+
+```bash
+openssl x509 -in server.crt -text -noout
+```
+
+No output seguinte verifica-se que o Issuer é a CA criada por nós e que os nomes alternativos estão presentes:
+
+## Tarefa 4
+
+O objetivo desta tarefa é configurar um servidor Apache com suporte a HTTPS, utilizando o certificado público assinado pela nossa Certificate Authority (CA) na tarefa anterior.
+
+Em primeiro lugar, utilizámos os comandos do Docker para criar, correr e obter um terminal num contentor. No terminal copiámos o certificado (server.crt) e a chave (server.key) para a pasta /certs no contentor e um ficheiro de configuração foi criado em /etc/apache2/sites-available/bank32_apache_ssl.conf com o seguinte conteúdo:
+
+```apache
+<VirtualHost *:443>
+    DocumentRoot /var/www/bank32
+    ServerName www.bank32.com
+    ServerAlias www.bank32A.com
+    ServerAlias www.bank32B.com
+    DirectoryIndex index.html
+    SSLEngine On
+    SSLCertificateFile /certs/server.crt
+    SSLCertificateKeyFile /certs/server.key
+</VirtualHost>
+```
+
+Com a configuração completa, iniciámos o servidor com os seguintes comandos:
+```bash
+a2enmod ssl
+a2ensite bank32_apache_ssl
+service apache2 start
+```
+
+Antes de acedermos ao servidor a partir do navegador, tivemos que adicionar o certificado raiz da CA criado na tarefa 1 (ca.crt) à lista de certificados do navegador, pois, como é uma entidade certificadora privada, o navegador não a aceita por defeito.
+
+Finalmente conseguimos aceder ao website, como vemos na imagem:
+
+**Imagem 2:** www.bank32.com
+![website](/docs/logbook11/task4_website.png)
