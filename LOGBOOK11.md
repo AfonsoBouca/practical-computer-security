@@ -312,3 +312,14 @@ A partir deste output identificam-se os seguintes valores:
 - Prime2 (q): Primo 2 utilizado para gerar o modulos.
 
 ## Tarefa 2
+Nesta tarefa vamos obter um certificado público assinado pela nossa Certificate Authority (CA) para o website **www.bank32.com** que tem nomes alternativos. Para tal, é necessário gerar um Certificate Signing Request (CSR), que contém a chave pública do servidor e a informação de identidade da entidade requerente gerado atravez do seguinte comando:
+
+```bash
+openssl req -newkey rsa:2048 -sha256 \
+    -keyout server.key -out server.csr \
+    -subj "/CN=www.bank32.com/O=Bank32 Inc./C=US" \
+    -addext "subjectAltName=DNS:www.bank32.com,DNS:www.bank32A.com,DNS:www.bank32B.com" \
+    -passout pass:dees
+```
+
+## Tarefa 3
