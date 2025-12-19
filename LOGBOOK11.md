@@ -400,3 +400,41 @@ Ao tentar aceder ao endereço https://www.example.com através do navegador Fire
 
 **Imagem 3:** Ataque MITM travado pela PKI.
 ![alt text](docs/logbook11/task5.png)
+
+## Tarefa 6
+
+O objetivo desta tarefa foi demonstrar como um ataque Man‑In‑The‑Middle (MITM) pode ser bem‑sucedido quando uma Autoridade Certificadora (CA) raiz se encontra comprometida, permitindo ao atacante gerar certificados válidos para qualquer domínio. Neste cenário, a Infraestrutura de Chaves Públicas (PKI) deixa de conseguir proteger o utilizador, uma vez que a cadeia de confiança é quebrada na sua raiz.
+
+Para realizar o ataque, foi reutilizado o ambiente da Tarefa 5. O servidor malicioso foi configurado para impersonar o website www.example.com
+, mas desta vez foi gerado um novo certificado TLS para este domínio como vemos na configuração seguinte, assinado pela CA raiz comprometida (seguindo as instruções das tarefas 2 e 3). Como esta CA se encontra instalada e marcada como confiável no navegador da vítima, o certificado apresentado pelo servidor malicioso é considerado válido.
+
+```apache
+<VirtualHost *:443>
+    DocumentRoot /var/www/bank32
+    ServerName www.example.com
+    ServerAlias example.com
+    DirectoryIndex index.html
+    SSLEngine On
+    SSLCertificateFile /certs/example_com.crt
+    SSLCertificateKeyFile /certs/example_com.key
+</VirtualHost>
+```
+
+```bash
+openssl req -newkey rsa:2048 -sha256 \
+    -keyout example_com.key -out example_com.csr \
+    -subj "/CN=www.example.com/O=Bank32 Inc./C=US" \
+    -addext "subjectAltName=DNS:www.example.com,DNS:example.com" \
+    -passout pass:dees
+```
+```bash
+openssl ca -config myCA_openssl.cnf -policy policy_anything \
+    -md sha256 -days 3650 \
+    -in example_com.csr -out example_com.crt -batch \
+    -cert ca.crt -keyfile ca.key
+```
+
+Como a máquina da vítima já tem o domínio mapeado para o website comprometido, como na tarefa 5, acedemos o website malicioso e não o website pretendido. Como o certificado raíz está comprometido o browser não identifica o website como malacioso e o user encontra-se em perigo como vemos na imagem 4.
+
+**Imagem 4:**  Ataque MITM
+![alt text](docs/logbook11/task6.png)
