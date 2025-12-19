@@ -376,3 +376,27 @@ Finalmente conseguimos aceder ao website, como vemos na imagem:
 
 **Imagem 2:** www.bank32.com
 ![website](/docs/logbook11/task4_website.png)
+
+## Tarefa 5
+O objetivo desta tarefa foi demonstrar como a Infraestrutura de Chaves Públicas (PKI) consegue impedir ataques do tipo Man‑In‑The‑Middle (MITM), mesmo quando o atacante consegue intercetar o tráfego e apresentar um website falso através de HTTPS.
+
+Nesta tarefa reconfiguramos o servidor anterior para impersonar o website www.example.com utilizando os mesmos certificados do www.bank32.com com o seguinte ficheiro:
+
+```apache
+<VirtualHost *:443> 
+    DocumentRoot /var/www/bank32
+    ServerName www.example.com
+    ServerAlias example.com
+    DirectoryIndex index.html
+    SSLEngine On
+    SSLCertificateFile /certs/server.crt
+    SSLCertificateKeyFile /certs/server.key
+</VirtualHost>
+```
+
+De seguida, para simular um ataque de envenenamento de DNS, foi alterado o ficheiro /etc/hosts da máquina da vítima, mapeando o domínio www.example.com para o endereço IP do servidor malicioso.
+
+Ao tentar aceder ao endereço https://www.example.com através do navegador Firefox, foi apresentada uma página de aviso com a mensagem “Warning: Potential Security Risk Ahead”, impedindo o acesso ao website como vemos na imagem 3. Isto aconteceu porque o servidor apresentou um certificado de um website distinto do qual estávamos a tentar aceder.
+
+**Imagem 3:** Ataque MITM travado pela PKI.
+![alt text](docs/logbook11/task5.png)
