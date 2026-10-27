@@ -1,8 +1,8 @@
 # Environment Variable and Set-UID Lab
 
-## Questão 1
+## Environment variables
 ### Tasks 1-5
-- **Task 1**: Nesta primeira tarefa do guião somos apresentados às variáveis de ambiente e aprendemos a modificá-las com uso de *printenv* e *unset*.
+- **Task 1**: Nesta primeira tarefa do exercício somos apresentados às variáveis de ambiente e aprendemos a modificá-las com uso de *printenv* e *unset*.
 
 - **Task 2**: Nesta tarefa verificámos que o processo filho herda as variáveis de ambiente do processo pai, pois não há diferenças a registar-se como é mostrado na imagem abaixo.
   - **Imagem 1:**  Tarefa 2
@@ -47,7 +47,7 @@ Agora apenas é necessário correr o programa com a vulnerabilidade (linha 3 da 
 **Imagem 3:** Código executado pelo atacante sem permissões root
 ![image](docs/task6_attack.png)
 
-## Questão 2
+## Command injection
 ### Task 8 
 Nesta tarefa analisámos a segurança de um programa, catall.c, que foi concebido para ser utilizado como **set‑UID**. Este programa permite a leitura de ficheiros do sistema aos quais certos utilizadores normalmente não tem accesso (Bob). No entanto, o programa faz uso de system() que invoca o shell do sistema onde é passada uma string, que é interpretada. O shell interpreta não só a string mas também metacaracteres, onde a partir dai, é possivel realizar um command injection.
 Como mostrado na Imagem 3, criámos um ficheiro de teste task8.txt com texto simples.
@@ -74,7 +74,7 @@ O ficheiro também foi lido como esperado mas desta vez, ao tentar realizar nova
 Devido ao uso de execve(), o binaŕio é executado diretamente sem invocar shell, onde o programa cat tenta abrir um ficheiro com o exato nome "task8.txt;rm task8.txt", não executanto o comando rm e mantendo a integridade do ficheiro.
 
 
-## Questão 3
+## File descriptor leaks
 ### Task 9
 ### Preparação
 Numa vulnerabilidade de partilha de capabilities, existe um ficheiro cujo único editor é o root e um programa Set-UID que mantém esse ficheiro aberto e nos fornece uma linha de comandos (shell) com os privilégios do utilizador normal. Para demonstrar a vulnerabilidade é utilizado o programa cap_leak.c com o seguinte código fonte:

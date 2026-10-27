@@ -1,5 +1,5 @@
 # Format-String Vulnerability Lab
-## Questão 1
+## Format-string attacks
 ### Task 1: 
 O objetivo desta task é fazer o programa format.c que está a correr no servidor dar crash atravez de uma vulnerabilidade de *Format String*.  
 
@@ -24,8 +24,7 @@ __format.c:__ Código vulnerável.
 #include <netinet/ip.h>
 
 /* Changing this size will change the layout of the stack.
- * Instructors can change this value each year, so students
- * won't be able to use the solutions from the past.
+ * The buffer size affects the layout of the stack.
  * Suggested value: between 10 and 400  */
 #ifndef BUF_SIZE
 #define BUF_SIZE 100
@@ -183,7 +182,7 @@ __Imagem 6:__ execução do ataque.
 ### Task 3B:
 Nesta task a variável que alteramos anteriormente tem que ser alterada para um valor específico (__0x5000__).
 Assim modificamos __mystr.py__ para que formate o primeiro valor hexadecimal lido com o número de espaços necessário para reescrever o valor correto.  
-Atingimos o valor obtido no código subtraindo ao valor do enunciado os 4 caracteres do endereço do começo mais os restantes 62 números hexadecimais lidos necessários para chegar novamente à string, cuja formatação os faz ter 9 caracteres cada.
+Atingimos o valor obtido no código subtraindo ao valor pretendido os 4 caracteres do endereço do começo mais os restantes 62 números hexadecimais lidos necessários para chegar novamente à string, cuja formatação os faz ter 9 caracteres cada.
 
 __mystr.py (modificado)__
 ```python
@@ -225,7 +224,7 @@ Finalmente executamos o mesmo ataque da task 3A e verificamos que o valor da var
 __Imagem 7:__ execução do ataque.
 ![imagem](docs/logbook6/task3B.png)
 
-## Questão 2
+## Security implications
 
 Qualquer programa que use dados controlados pelo utilizador diretamente como format string tem uma vulnerabilidade de __CWE-134__, mesmo que, na prática, não seja possível lançar um exploit.  
 Das tarefas realizadas, apenas a Task 1 funcionaria sempre nas condições descritas, porque é o único ataque que não depende do fornecimento de endereços como argumentos pelo atacante. As Tasks 2 e 3 exigem a leitura de endereços que apontem para as variáveis alvo, por isso essas tarefas falhariam se não existirem endereços úteis na stack. Ainda assim, Tasks 2 e 3 podem ser completadas se for possível descobrir na stack os endereços das variáveis que queremos atacar.

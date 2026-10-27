@@ -1,6 +1,6 @@
 # Buffer-Overflow Attack Lab - Set-UID Version
 
-Na primeira parte do guião, desativamos o Address Space Randomization (de forma a que os endereços na stack são previsíveis) e configuramos /bin/sh para zsh para facilitar permitir a execução do shell por processos com Set-UID.
+Na primeira parte do exercício, desativamos o Address Space Randomization (de forma a que os endereços na stack são previsíveis) e configuramos /bin/sh para zsh para facilitar permitir a execução do shell por processos com Set-UID.
 
 Comandos usados:
 >```bash
@@ -35,7 +35,7 @@ int bof(char *str)
 }
 ```
 
-Para compilar este programa vulnerável, desativamos o StackGuard e as proteções contra a execução de código por parte da stack. Também definimos como Set-UID, para que de forma a explorar a vulnerabilidade, conseguirmos ter acesso à root shell. Além disso, também ajustámos o valor de L1, como pedido, para 100+8*G, ou seja, o nosso L1 = 100+8*5 = 140.
+Para compilar este programa vulnerável, desativamos o StackGuard e as proteções contra a execução de código por parte da stack. Também definimos como Set-UID, para que de forma a explorar a vulnerabilidade, conseguirmos ter acesso à root shell. Além disso, também ajustámos o valor de L1, para 100+8*G, ou seja, o nosso L1 = 100+8*5 = 140.
 
 ![image](docs/logbook5/task2_stack.c_setuid.png)
 

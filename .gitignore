@@ -1,0 +1,27 @@
+# Local lab output and temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+*.pyc
+__pycache__/
+
+# Generated certificates, keys, and local PKI state
+*.key
+*.csr
+*.crt
+*.pem
+*.p12
+*.jks
+index.txt
+index.txt.old
+serial
+serial.old
+
+# Local environment and editor settings
+.env
+.env.*
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store

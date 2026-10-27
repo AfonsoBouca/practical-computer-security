@@ -1,5 +1,5 @@
 # Secret Key Encryption
-## Tarefa 1
+## Substitution cipher
 O objetivo desta tarefa era entender como a encriptação de substituição simples funciona e como utilizar o comando __tr__, que substitui cada aparência de um caracter por outro, para executar e decifrar cifras de substituição de letras em ficheiros de texto simples.
 
 Utilizando o código __freq.py__, e com o objetivo de decifrar um texto simples, nós fomos capazes de recolher os 1,2 e 3-gramas mais comuns do texto cifrado:
@@ -206,7 +206,7 @@ DIRECTOR AND APART FROM ARGO MOVIES THAT LAND BEST PICTURE WITHOUT ALSO
 EARNING BEST DIRECTOR NOMINATIONS ARE FEW AND FAR BETWEEN
 ```
 
-## Tarefa 2
+## AES encryption modes
 Nesta tarefa estudámos o funcionamento de diferentes modos de cifração do algoritmo AES-128, observando como cada um processa e transforma texto claro durante a cifragem e decifragem.
 
 Para isso foi criado o ficheiro __plaintext.txt__ com o seguinte texto e 1041 bytes de tamanho:
@@ -292,7 +292,7 @@ A segurança depende crucialmente de nunca reutilizar o mesmo IV com a mesma cha
 
 A principal diferença deste modo para os restantes é a utilização do mesmo algoritmo para a cifração e decifração como verificamos na figura 3: Obtemos o texto original cifrando ou decifrando o texto cifrado.
 
-## Tarefa 5
+## Error propagation
 O objetivo desta tarefa é entender como a corrupção de um byte no texto cifrado afeta o resultado da cifra.
 Com isso em mente executamos os mesmos passos da tarefa 2 para cada modo de cifra mas antes da decifragem modificamos o byte 250 do texto cifrado para AA.
 
